@@ -1,0 +1,8 @@
+*.hi
+*.o
+*.info
+*.txt
+Main
+.stack-work/
+Graforis.cabal
+*~
