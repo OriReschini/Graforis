@@ -1,5 +1,7 @@
 {
 module Lexer where
+
+import AST
 }
 
 %wrapper "posn"
@@ -21,7 +23,8 @@ tokens :-
   \(                                 { \pos s -> ParenOpenT pos }
   \)		          	                 { \pos s -> ParenCloseT pos }
   empty                              { \pos s -> EmptyGT pos }
-  [$alpha $digit \_ \']+	           { \pos s -> NameT pos s }
+  [$alpha $digit \_ \']+	           { \pos s -> VertexT pos s }
+  \# [$alpha $digit \_ \']+          { \pos s -> VarT pos s }
   [\/\.]* [$alpha $digit \_ \. \/]+  { \pos s -> PathT pos s }
 
 {
@@ -35,18 +38,20 @@ data Token =  DrawT AlexPosn
             | ParenCloseT AlexPosn
             | EmptyGT AlexPosn
             | PathT AlexPosn String
-            | NameT AlexPosn String
+            | VertexT AlexPosn String
+            | VarT AlexPosn String
               deriving (Eq,Show)
 
-token_posn (DrawT p) = p
-token_posn (ApplyT p) = p
-token_posn (AssignmentT p) = p
-token_posn (SemiColonT p) = p
-token_posn (OverlayT p) = p
-token_posn (ConnectT p) = p
-token_posn (ParenOpenT p) = p
-token_posn (ParenCloseT p) = p
-token_posn (EmptyGT p) = p
-token_posn (PathT p _) = p
-token_posn (NameT p _) = p 
+token_posn (DrawT (AlexPn _ l c)) = Position l c
+token_posn (ApplyT (AlexPn _ l c)) = Position l c
+token_posn (AssignmentT (AlexPn _ l c)) = Position l c
+token_posn (SemiColonT (AlexPn _ l c)) = Position l c
+token_posn (OverlayT (AlexPn _ l c)) = Position l c
+token_posn (ConnectT (AlexPn _ l c)) = Position l c
+token_posn (ParenOpenT (AlexPn _ l c)) = Position l c
+token_posn (ParenCloseT (AlexPn _ l c)) = Position l c
+token_posn (EmptyGT (AlexPn _ l c)) = Position l c
+token_posn (PathT (AlexPn _ l c) _) = Position l c
+token_posn (VertexT (AlexPn _ l c) _) = Position l c
+token_posn (VarT (AlexPn _ l c) _) = Position l c
 }
