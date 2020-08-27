@@ -1,0 +1,3 @@
+-- use variable defined previously to refer to a graph
+#grafo1 := (a+b*c);
+#grafo2 := #grafo1 + d

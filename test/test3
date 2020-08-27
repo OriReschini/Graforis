@@ -1,0 +1,3 @@
+-- draw graph by giving a variable name
+#grafo  := a+a;
+draw #grafo
