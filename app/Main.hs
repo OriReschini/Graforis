@@ -1,19 +1,37 @@
-module Main where
+module Main (main) where
 
 import Lib
 import System.Environment (getArgs)
 import Lexer
 import Parser
-
+import State
+import AST 
+import Eval               (eval)
+                    
 main :: IO ()
---main = someFunc
-
 main = do args <- getArgs
           case args of
-            [] -> putStrLn "Error: there is no input file."
             (file:_) -> run file
+            _ -> printHelp
+
+-- ARREGLAR ESTO
+showEnv :: Env -> IO ()
+showEnv [] = print ""
+showEnv ((n,g):e) = do putStrLn $ n ++ " : " ++ show g
+                       showEnv e
+
 
 run :: [Char] -> IO ()
 run file = do f <- readFile file
-              print (alexScanTokens f)
-              print (parse (alexScanTokens f))
+              --print (eval (parse (alexScanTokens f)))
+              res <- eval (parse (alexScanTokens f))
+              print res
+              --case eval (parse (alexScanTokens f)) of
+              --  Left error -> print error
+                --Right (list, env) -> 
+                  --drawList list 
+                  --showEnv env --asquerosidad
+            
+
+printHelp :: IO ()
+printHelp = do putStrLn "Error, no input file."
