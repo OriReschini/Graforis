@@ -30,9 +30,13 @@ evalGraph (Connect g1 g2) i = do
     g1' <- evalGraph g1 i 
     g2' <- evalGraph g2 (i + (noNodes g1'))
     let newEdges = connect (labNodes g1') (labNodes g2') []
-        (nodes,edges) = (uniqueNodes (labNodes g1'++labNodes g2') (newEdges++labEdges g1'++labEdges g2') )
+        (nodes,edges) = uniqueNodes (labNodes g1'++labNodes g2') (newEdges++labEdges g1'++labEdges g2') 
     return (mkGraph nodes edges)
-evalGraph (Var n) i         = lookfor n 
+evalGraph (Var n) i         = do 
+    g <- lookfor n 
+    let nodes = adjustNodes (labNodes g) i 
+        edges = adjustEdges (labEdges g) i 
+    return (mkGraph nodes edges)
    
 replaceE :: [LEdge ()] -> Int -> Int -> [LEdge ()]
 replaceE [] _ _ = []
@@ -69,17 +73,25 @@ uniqueNodes ((i,name):ns) edges
               | has ns name = let idx = idxName name ns
                                   newNodes = replaceN ns idx i 
                                   newEdges = replaceE edges idx i
-                                in (newNodes, newEdges)
+                                  (nodes',edges') = uniqueNodes newNodes newEdges
+                                in ( (i,name):nodes', edges' )
               | otherwise = let (nodes, edges') = uniqueNodes ns edges 
-                              in ( ((i,name):nodes), edges')
+                              in ( ((i,name):nodes), edges' )
 
 -- connect l1 l2 returns the list of edges (n1, n2), where n1 in l1, n2 in l2
 connect :: [LNode String] -> [LNode String] -> [LEdge ()] -> [LEdge ()]
 connect [] _ edges = edges
 connect _ [] edges = edges
-connect ((i1,n1):ns1) ((i2,n2):ns2) edges = 
+connect ((i1,n1):ns1) l2@((i2,n2):ns2) edges = 
   let edges1 = connect [(i1,n1)] ns2 edges
-      edges2 = connect ns1 ((i2,n2):ns2) edges1
+      edges2 = connect ns1 l2 edges1
       e = (i1,i2,()) :: LEdge ()
-    in (e : ( edges1 ++ edges2 )) 
+    in (e : edges2 ) 
 
+adjustNodes :: [LNode String] -> Int -> [LNode String]
+adjustNodes [] _ = []
+adjustNodes ( (idx,name):ns ) i = ( (idx+i,name) : adjustNodes ns i )
+
+adjustEdges :: [LEdge ()] -> Int -> [LEdge ()]
+adjustEdges [] _ = []
+adjustEdges ( (src,dst,()):es ) i = ( (src+i,dst+i,()) : adjustEdges es i )
