@@ -1,0 +1,4 @@
+-- define a graph overlaying it with a node already defined
+#grafo1 := 1*2*(3+4);
+#grafo2 := 1 + #grafo1;
+draw #grafo2

@@ -1,0 +1,3 @@
+-- Error: a graph with a loop is not colourable
+#grafo := a*a;
+colour #grafo
