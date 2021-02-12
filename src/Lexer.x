@@ -15,7 +15,7 @@ tokens :-
   $white+                               ;
   "--".*                                ;
   draw				                       { \pos s -> DrawT pos }
-  apply                              { \pos s -> ApplyT pos }
+  colour                             { \pos s -> ColourT pos }
   ":="                               { \pos s -> AssignmentT pos }
   \;                                 { \pos s -> SemiColonT pos }
   \+                                 { \pos s -> OverlayT pos }
@@ -29,7 +29,7 @@ tokens :-
 
 {
 data Token =  DrawT AlexPosn
-            | ApplyT AlexPosn
+            | ColourT AlexPosn
             | AssignmentT AlexPosn
             | SemiColonT AlexPosn
             | OverlayT AlexPosn
@@ -43,7 +43,7 @@ data Token =  DrawT AlexPosn
               deriving (Eq,Show)
 
 token_posn (DrawT (AlexPn _ l c)) = Position l c
-token_posn (ApplyT (AlexPn _ l c)) = Position l c
+token_posn (ColourT (AlexPn _ l c)) = Position l c
 token_posn (AssignmentT (AlexPn _ l c)) = Position l c
 token_posn (SemiColonT (AlexPn _ l c)) = Position l c
 token_posn (OverlayT (AlexPn _ l c)) = Position l c

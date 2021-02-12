@@ -17,15 +17,14 @@ instance Show Graph where
 
 data Comm = DefVar Name Graph
           | Draw Graph
-          | Apply Name Graph Name Name
+          | Colour Graph
           | Seq Comm Comm
 
 instance Show Comm where
-  show (DefVar n g)        = n ++ " := " ++ show g
-  show (Draw g)            = "draw " ++ show g
-  show (Apply p g ori des) = "apply " ++ show p ++ " to " ++ show g
-                           ++ " from vertex " ++ ori ++ " to vertex " ++ des
-  show (Seq c1 c2)         = show c1 ++ "\n" ++ show c2
+  show (DefVar n g) = n ++ " := " ++ show g
+  show (Draw g)     = "draw " ++ show g
+  show (Colour g)   = "colour " ++ show g 
+  show (Seq c1 c2)  = show c1 ++ "\n" ++ show c2
 
 data Position = Position Int Int -- Position line column
 

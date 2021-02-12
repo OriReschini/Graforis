@@ -6,7 +6,7 @@ import Lexer
 import Parser
 import State
 import AST 
-import Eval               (eval)
+import Eval               
                     
 main :: IO ()
 main = do args <- getArgs
@@ -23,7 +23,7 @@ showEnv ((n,g):e) = do putStrLn $ n ++ " : " ++ show g
 
 run :: [Char] -> IO ()
 run file = do f <- readFile file
-              --print (eval (parse (alexScanTokens f)))
+              print (parse (alexScanTokens f))
               res <- eval (parse (alexScanTokens f))
               print res
               --case eval (parse (alexScanTokens f)) of

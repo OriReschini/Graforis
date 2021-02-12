@@ -1,38 +1,36 @@
-module Draw(draw) where
+module Draw (draw) where
 
 import State
 import AST 
+import Lib
 import Data.Graph.Inductive.PatriciaTree (Gr)
-import Data.GraphViz                     (graphToDot, GraphvizParams(..), isDirected, globalAttributes, clusterBy,
-                                         isDotCluster, NodeCluster(..), clusterID, GraphID(..), Number(Int), fmtCluster, fmtNode, fmtEdge)
-import Data.GraphViz.Attributes.Complete (Label(StrLabel), Attribute(Label)) 
-import Data.GraphViz.Printing            (renderDot, toDot, dot)
-import Data.Text.Lazy                    (unpack, pack)
-import System.Process                    (callCommand, system)
-import System.Directory                  (removeFile)
+import Data.GraphViz                     (graphToDot, GraphvizParams(..), NodeCluster(..), GraphID(..), Number(Int))
+import Data.GraphViz.Attributes.Complete (Attribute(Label, Color), toColorList, Color(RGB)) 
+import Data.GraphViz.Attributes          (toLabel, Labellable)
+import Data.GraphViz.Printing            (renderDot, toDot)
+import Data.Text.Lazy                    (unpack)
 
-myDefaultParams :: GraphvizParams n nl el () nl
+myDefaultParams :: (Labellable nl) => GraphvizParams n nl el () nl
 myDefaultParams = Params { isDirected       = False
                        , globalAttributes = []
                        , clusterBy        = N
                        , isDotCluster     = const True
                        , clusterID        = const (Num $ Int 0)
                        , fmtCluster       = const []
-                       , fmtNode          = const []
+                       , fmtNode          = nodes
                        , fmtEdge          = const []
                        }
+                    where nodes (num,label) = [toLabel label]
 
-labelledNodesParams = myDefaultParams { fmtNode= \(_,label)-> [Label (StrLabel (pack label))] }  
+--colorsParams = myDefaultParams { fmtNode = \(a, label) -> color a label}
 
-createFile :: String -> Name -> IO ()
-createFile dot name = do
-    writeFile (name++".dot") dot
-    callCommand ("dot -Tpng -o"++name++".png "++name++".dot")
+--color a label | a == 2 = [toLabel label, Color $ (toColorList [RGB 200 2 2])]
+--              | otherwise = [toLabel label, Color $ (toColorList [RGB 1 220 21])]
+--labelledNodesParams = myDefaultParams { fmtNode= \(_,label)-> [Label (StrLabel (pack label)), Color $ toColorList [RGB 40 255 40] ] }  
 
 
-draw :: MonadTrans t => Name -> Gr String () -> t IO ()
-draw name g = do
-    let dot = unpack $ renderDot $ toDot $ graphToDot labelledNodesParams g
+draw :: MonadTrans t => Gr String () -> Name -> t IO ()
+draw g name = do
+    let dot = unpack $ renderDot $ toDot $ graphToDot myDefaultParams g
     lift (createFile dot name)
-    --lift (removeFile (name++".dot"))
 

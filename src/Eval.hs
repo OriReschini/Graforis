@@ -3,6 +3,7 @@ module Eval (eval) where
 import AST
 import State
 import Draw                                (draw)
+import Colour                              (colour)
 import Data.Graph.Inductive.Graph          (mkGraph, empty, noNodes, labNodes, labEdges, LNode, LEdge)
 import Data.Graph.Inductive.PatriciaTree   (Gr)
 
@@ -10,10 +11,10 @@ import Data.Graph.Inductive.PatriciaTree   (Gr)
 eval :: Comm -> IO (Either Error ((), Env))
 eval p = runGraphStateT (evalComm p) initState
 
---evalComm :: (MonadState m, MonadError m, MonadTrans t) => Comm -> t m ()
+evalComm :: (MonadState (t IO), MonadError (t IO), MonadTrans t) => Comm -> t IO ()
 evalComm (DefVar n g) = (evalGraph g 1) >>= (\g' -> save n g')
-evalComm (Draw g) = (evalGraph g 1) >>= (\g' -> draw "prueba" g')
---evalComm (Apply n g ori des) =
+evalComm (Draw g) = (evalGraph g 1) >>= (\g' -> draw g' (nameFile g))
+evalComm (Colour g) = (evalGraph g 1) >>= (\g' -> colour g' (nameFile g))
 evalComm (Seq c1 c2) = (evalComm c1) >>= (\x -> evalComm c2)
 
 
@@ -58,13 +59,14 @@ idxName :: String -> [LNode String] -> Int
 idxName s ((i,name):ns) | s == name = i
                         | otherwise = idxName s ns
 
+-- has ns n devuelve true si n está en ns. En caso contrario, devuelve false
 has :: [LNode String] -> String -> Bool
 has [] _ = False
 has ((i,name):ns) s | s == name = True
                     | otherwise = has ns s 
 
--- given a list of nodes and edges, returns a tuple with a list of nodes and edges
--- where nodes with the same name, have the same value (int)
+-- uniqueNodes ns es devuelve una tupla con una lista de nodos y una lista de aristas
+-- en las que los nodos con el mismo nombre tienen el mismo valor (int)
 -- originalmente quería que devuela un Gr String (), pero en el caso base:
 -- uniqueNodes [] edges si hacía mkGraph [] edges, me devolvía grafo vacío
 uniqueNodes :: [LNode String] -> [LEdge ()] -> ([LNode String], [LEdge ()])
@@ -78,20 +80,29 @@ uniqueNodes ((i,name):ns) edges
               | otherwise = let (nodes, edges') = uniqueNodes ns edges 
                               in ( ((i,name):nodes), edges' )
 
--- connect l1 l2 returns the list of edges (n1, n2), where n1 in l1, n2 in l2
+-- connect l1 l2 e devuelve la lista de aristas (n1, n2), donde n1 en l1, n2 en l2
+-- en e se van acumulando las aristas
 connect :: [LNode String] -> [LNode String] -> [LEdge ()] -> [LEdge ()]
 connect [] _ edges = edges
 connect _ [] edges = edges
 connect ((i1,n1):ns1) l2@((i2,n2):ns2) edges = 
-  let edges1 = connect [(i1,n1)] ns2 edges
+  let edges1 = connect [(i1,n1)] ns2 edges 
       edges2 = connect ns1 l2 edges1
       e = (i1,i2,()) :: LEdge ()
     in (e : edges2 ) 
 
+-- adjustNodes l i devuelve una lista de nodos en la que a cada nodo se me sumó i
 adjustNodes :: [LNode String] -> Int -> [LNode String]
 adjustNodes [] _ = []
 adjustNodes ( (idx,name):ns ) i = ( (idx+i,name) : adjustNodes ns i )
 
+-- adjustEdges l i devuelve una lista de aristas en la que al origen y destino de cada arista se le sumó i
 adjustEdges :: [LEdge ()] -> Int -> [LEdge ()]
 adjustEdges [] _ = []
 adjustEdges ( (src,dst,()):es ) i = ( (src+i,dst+i,()) : adjustEdges es i )
+
+-- nameFile g devuelve un string que será el nombre del archivo que se creará
+-- si g no es una variable, el archivo se llamará "output"
+nameFile :: Graph -> String
+nameFile (Var n) = tail n -- devuelvo tail n porque n empieza con '#'
+nameFile g = "output"

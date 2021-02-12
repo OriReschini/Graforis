@@ -11,7 +11,7 @@ import AST
 
 %token
   draw      { DrawT _ }
-  apply     { ApplyT _ }
+  colour    { ColourT _ }
   ':='      { AssignmentT _ }
   ';'       { SemiColonT _ }
   '+'       { OverlayT _ }
@@ -31,10 +31,10 @@ import AST
 %%
 
 Exp :: { Comm }
-Exp : var ':=' Graph_                     { DefVar $1 $3 }
-    | draw Graph_                         { Draw $2 }
-    | apply filePath Graph_ vertex vertex { Apply $2 $3 $4 $5 }
-    | Exp ';' Exp                         { Seq $1 $3 }
+Exp : var ':=' Graph_  { DefVar $1 $3 }
+    | draw Graph_      { Draw $2 }
+    | colour Graph_    { Colour $2 }
+    | Exp ';' Exp      { Seq $1 $3 }
 
 Graph_ :: { Graph }
 Graph_ : empty              { Empty }

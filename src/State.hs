@@ -11,12 +11,14 @@ initState :: Env
 initState = []
 
 data Error = UndefinedGraph Name
+           | UncolourableGraph Name
 --           | agregar otros
 
 instance Show Error where
-  show (UndefinedGraph n) = "Graph " ++ show n ++ " was not defined."
+  show (UndefinedGraph n)    = "Graph " ++ show n ++ " was not defined."
+  show (UncolourableGraph n) = "Graph " ++ show n ++ " is not colourable."
 
-newtype GraphStateT m a = GraphStateT { runGraphStateT :: Env -> m (Either Error (a,Env)) }
+newtype GraphStateT m a = GraphStateT { runGraphStateT :: Env -> m (Either Error (a,Env)) } -- VER DE PONER Env -> ErrorT Error m a ??????????????????
 
 -- given a string n and an environment e, returns True if n is a graph in e
 isVarDef :: Name -> Env -> Bool
@@ -41,10 +43,12 @@ instance (Monad m) => Applicative (GraphStateT m) where
     (<*>)  = ap
 
 class (Monad m) => MonadError m where 
-    throwUndefGraph :: Name -> m a
+    throwUndefinedG :: Name -> m a
+    throwUncolourableG :: Name -> m a
 
 instance (Monad m) => MonadError (GraphStateT m) where
-    throwUndefGraph n = GraphStateT $ \s -> return $ Left (UndefinedGraph n)
+    throwUndefinedG n    = GraphStateT $ \s -> return $ Left (UndefinedGraph n)
+    throwUncolourableG n = GraphStateT $ \s -> return $ Left (UncolourableGraph n)
 
 class (Monad m) => MonadState m where
     getEnv :: m Env 
@@ -55,7 +59,7 @@ instance (Monad m) => MonadState (GraphStateT m) where
     getEnv = GraphStateT $ \s -> return $ Right (s,s)
     lookfor n = do e <- getEnv
                    if isVarDef n e then GraphStateT $ \s -> return $ Right (lookfor' n e, s)
-                                   else throwUndefGraph n 
+                                   else throwUndefinedG n 
                         where lookfor' n ((i,g):e) | i == n    = g
                                                    | otherwise = lookfor' n e
     save n g = GraphStateT $ \s -> return $ Right ((), save' n g s)
