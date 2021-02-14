@@ -49,9 +49,9 @@ sortGraphNodes g = sortOn (\(node, neighbours) -> negate(length neighbours)) nod
                     where nodesWithNeighbours = map (\i -> (i, neighbors g i)) (nodes g)
 
 availableColours :: [ColorList]
--- orden colores: rojo, verde, azul, amarillo, celeste claro, fucsia, naranja, violeta, celeste "normal", verde oscuro, azul oscuro, marron
-availableColours = [toColorList [RGB 255 0 0], toColorList [RGB 0 255 0], toColorList [RGB 0 0 255], toColorList [RGB 255 255 0],
-                    toColorList [RGB 0 255 255], toColorList [RGB 255 0 255], toColorList [RGB 255 128 0], toColorList [RGB 127 255 0], 
+-- orden colores: rojo, verde, azul, celeste, fucsia, naranja, violeta, amarillo, azul no tan oscuro, verde oscuro, azul oscuro, marron
+availableColours = [toColorList [RGB 255 0 0], toColorList [RGB 0 255 0], toColorList [RGB 0 0 255], toColorList [RGB 0 255 255],
+                    toColorList [RGB 255 0 255], toColorList [RGB 255 128 0], toColorList [RGB 127 0 255], toColorList [RGB 255 255 0], 
                     toColorList [RGB 0 128 255], toColorList [RGB 0 102 0], toColorList [RGB 0 0 102], toColorList [RGB 102 0 0]]
 
 -- retrurns a list of tuples (n, i) where n is a node and i is the int that represents the colour assigned
@@ -65,11 +65,6 @@ realAssignment sortedNodes res k = realAssignment [n | n <- sortedNodes, (fst n,
                                                 then colourNodesWith k ns res
                                                 else colourNodesWith k ns ((node, availableColours !! k) : res)
                                           newRes = colourNodesWith k sortedNodes res
-
--- selectColours takes an integer k and returns a list of k different colours
---selectColours :: Integer -> [Attribute]
---selectColours 0 = []
---selectColours k = 
 
 -- assignColours g returns a coloured graph
 assignColours :: Gr String () -> Gr (String, Attribute) ()

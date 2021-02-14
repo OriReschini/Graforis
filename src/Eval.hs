@@ -43,8 +43,9 @@ replaceE :: [LEdge ()] -> Int -> Int -> [LEdge ()]
 replaceE [] _ _ = []
 replaceE ((ori, des, ()):es) old new 
           | ori == old && des == old = ( (new, new, ()) : (replaceE es old new) )
-          | ori == old = ( (new, des, ()) : (replaceE es old new) )
-          | des == old = ( (ori, new, ()) : (replaceE es old new) )
+          -- origin has to be smaller than destination
+          | ori == old = if new < des then ( (new, des, ()) : (replaceE es old new) ) else ( (des, new, ()) : (replaceE es old new) )
+          | des == old = if ori < new then ( (ori, new, ()) : (replaceE es old new) ) else ( (new, ori, ()) : (replaceE es old new) )
           | otherwise = ( (ori, des, ()) : (replaceE es old new) )
 
 replaceN :: [LNode String] -> Int -> Int -> [LNode String]
@@ -89,7 +90,7 @@ connect ((i1,n1):ns1) l2@((i2,n2):ns2) edges =
   let edges1 = connect [(i1,n1)] ns2 edges 
       edges2 = connect ns1 l2 edges1
       e = (i1,i2,()) :: LEdge ()
-    in (e : edges2 ) 
+    in if i1 > i2 then ( (i2,i1,()) : edges2 ) else ( (i1,i2,()) : edges2 )
 
 -- adjustNodes l i devuelve una lista de nodos en la que a cada nodo se me sumó i
 adjustNodes :: [LNode String] -> Int -> [LNode String]
