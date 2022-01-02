@@ -24,7 +24,7 @@ dependencies:
 - array
 - containers
 - text
-- graphviz
+- graphviz  
 - fgl
 - process
 - directory
@@ -53,3 +53,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - Graforis
+
+build-tools:
+  - alex
+  - happy
