@@ -25,7 +25,6 @@ tokens :-
   empty                              { \pos s -> EmptyGT pos }
   [$alpha $digit \_ \']+	           { \pos s -> VertexT pos s }
   \# [$alpha $digit \_ \']+          { \pos s -> VarT pos s }
-  [\/\.]* [$alpha $digit \_ \. \/]+  { \pos s -> PathT pos s }
 
 {
 data Token =  DrawT AlexPosn
@@ -37,7 +36,6 @@ data Token =  DrawT AlexPosn
             | ParenOpenT AlexPosn
             | ParenCloseT AlexPosn
             | EmptyGT AlexPosn
-            | PathT AlexPosn String
             | VertexT AlexPosn String
             | VarT AlexPosn String
               deriving (Eq,Show)
@@ -51,7 +49,6 @@ token_posn (ConnectT (AlexPn _ l c)) = Position l c
 token_posn (ParenOpenT (AlexPn _ l c)) = Position l c
 token_posn (ParenCloseT (AlexPn _ l c)) = Position l c
 token_posn (EmptyGT (AlexPn _ l c)) = Position l c
-token_posn (PathT (AlexPn _ l c) _) = Position l c
 token_posn (VertexT (AlexPn _ l c) _) = Position l c
 token_posn (VarT (AlexPn _ l c) _) = Position l c
 }

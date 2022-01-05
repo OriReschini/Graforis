@@ -21,7 +21,6 @@ import AST
   empty     { EmptyGT _ }
   vertex    { VertexT _ $$ }
   var       { VarT _ $$ }
-  filePath  { PathT _ $$ }
 
 %nonassoc ':='
 %right ';'
