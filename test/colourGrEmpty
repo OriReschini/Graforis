@@ -1,0 +1,3 @@
+-- will return a file with an empty image
+#grafo := empty;
+colour #grafo

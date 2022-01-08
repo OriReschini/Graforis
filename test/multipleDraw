@@ -1,0 +1,5 @@
+-- call the draw function a couple of times
+#grafo1 := a*b + c*d;
+draw #grafo1;
+#grafo2 := a + b*c + d;
+draw #grafo2

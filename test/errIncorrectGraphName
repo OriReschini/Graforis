@@ -1,0 +1,2 @@
+-- ERROR: try to define a graph variable with a name that doesn't start with #
+grafo := a + s + d + f
