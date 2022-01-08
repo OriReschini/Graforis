@@ -14,24 +14,18 @@ main = do args <- getArgs
             (file:_) -> run file
             _ -> printHelp
 
--- ARREGLAR ESTO
+run :: [Char] -> IO ()
+run file = do f <- readFile file
+              res <- eval (parse (alexScanTokens f))
+              case res of
+                Left e -> print e
+                Right (a,e) -> putStrLn $ "Program ran successfully!"
+            
+printHelp :: IO ()
+printHelp = do putStrLn "Error, no input file."
+
+-- used for debugging
 showEnv :: Env -> IO ()
 showEnv [] = print ""
 showEnv ((n,g):e) = do putStrLn $ n ++ " : " ++ show g
                        showEnv e
-
-
-run :: [Char] -> IO ()
-run file = do f <- readFile file
-              print (parse (alexScanTokens f))
-              res <- eval (parse (alexScanTokens f))
-              print res
-              --case eval (parse (alexScanTokens f)) of
-              --  Left error -> print error
-                --Right (list, env) -> 
-                  --drawList list 
-                  --showEnv env --asquerosidad
-            
-
-printHelp :: IO ()
-printHelp = do putStrLn "Error, no input file."
