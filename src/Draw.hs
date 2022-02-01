@@ -22,13 +22,6 @@ myDefaultParams = Params { isDirected       = False
                        }
                     where nodes (num,label) = [toLabel label]
 
---colorsParams = myDefaultParams { fmtNode = \(a, label) -> color a label}
-
---color a label | a == 2 = [toLabel label, Color $ (toColorList [RGB 200 2 2])]
---              | otherwise = [toLabel label, Color $ (toColorList [RGB 1 220 21])]
---labelledNodesParams = myDefaultParams { fmtNode= \(_,label)-> [Label (StrLabel (pack label)), Color $ toColorList [RGB 40 255 40] ] }  
-
-
 draw :: MonadTrans t => Gr String () -> Name -> t IO ()
 draw g name = do
     let dot = unpack $ renderDot $ toDot $ graphToDot myDefaultParams g
