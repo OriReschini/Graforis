@@ -4,7 +4,7 @@ import AST
 import State
 import Draw                                (draw)
 import Colour                              (colour)
-import Data.Graph.Inductive.Graph          (mkGraph, empty, noNodes, labNodes, labEdges, LNode, LEdge)
+import Data.Graph.Inductive.Graph          (mkGraph, empty, noNodes, labNodes, labEdges, LNode, LEdge, nodeRange)
 import Data.Graph.Inductive.PatriciaTree   (Gr)
 
 
@@ -23,13 +23,15 @@ evalGraph Empty _           = return empty -- :: Gr String ()
 evalGraph (Vertex n) i      = return (mkGraph [(i, n)] [])
 evalGraph (Overlay g1 g2) i = do 
     g1' <- evalGraph g1 i 
-    g2' <- evalGraph g2 (i + (noNodes g1')) 
+    let (minNode, maxNode) = nodeRange g1'
+    g2' <- evalGraph g2 (i + maxNode) 
     let (nodes,edges) = uniqueNodes (labNodes g1'++labNodes g2') (labEdges g1'++labEdges g2')
     return (mkGraph nodes edges)
     --return (uniqueNodes (labNodes g1'++labNodes g2') (labEdges g1'++labEdges g2'))
 evalGraph (Connect g1 g2) i = do 
     g1' <- evalGraph g1 i 
-    g2' <- evalGraph g2 (i + (noNodes g1'))
+    let (minNode, maxNode) = nodeRange g1'
+    g2' <- evalGraph g2 (i + maxNode)
     let newEdges = connect (labNodes g1') (labNodes g2') []
         (nodes,edges) = uniqueNodes (labNodes g1'++labNodes g2') (newEdges++labEdges g1'++labEdges g2') 
     return (mkGraph nodes edges)
