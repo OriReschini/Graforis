@@ -39,6 +39,8 @@ evalGraph (Var n) i         = do
         edges = adjustEdges (labEdges g) i 
     return (mkGraph nodes edges)
    
+-- replaceE es i k replaces in the list of edges es all appearences of i with k and makes sure that
+-- all edges' first node is smaller than the second node
 replaceE :: [LEdge ()] -> Int -> Int -> [LEdge ()]
 replaceE [] _ _ = []
 replaceE ((ori, des, ()):es) old new 
@@ -48,6 +50,7 @@ replaceE ((ori, des, ()):es) old new
           | des == old = if ori < new then ( (ori, new, ()) : (replaceE es old new) ) else ( (new, ori, ()) : (replaceE es old new) )
           | otherwise = ( (ori, des, ()) : (replaceE es old new) )
 
+-- replaceN ns i k replaces in the list of nodes ns all nodes with int i with k
 replaceN :: [LNode String] -> Int -> Int -> [LNode String]
 replaceN [] _ _ = []
 replaceN ((i, name):ns) old new 
@@ -60,16 +63,13 @@ idxName :: String -> [LNode String] -> Int
 idxName s ((i,name):ns) | s == name = i
                         | otherwise = idxName s ns
 
--- has ns n devuelve true si n está en ns. En caso contrario, devuelve false
+-- has ns n returns true if n is in ns. If not, it returns false.
 has :: [LNode String] -> String -> Bool
 has [] _ = False
 has ((i,name):ns) s | s == name = True
                     | otherwise = has ns s 
 
--- uniqueNodes ns es devuelve una tupla con una lista de nodos y una lista de aristas
--- en las que los nodos con el mismo nombre tienen el mismo valor (int)
--- originalmente quería que devuela un Gr String (), pero en el caso base:
--- uniqueNodes [] edges si hacía mkGraph [] edges, me devolvía grafo vacío
+-- uniqueNodes ns es returns a tuple (n, e) where all nodes with the same name have the same value (int).
 uniqueNodes :: [LNode String] -> [LEdge ()] -> ([LNode String], [LEdge ()])
 uniqueNodes [] edges = ([], edges)
 uniqueNodes ((i,name):ns) edges 
@@ -81,8 +81,8 @@ uniqueNodes ((i,name):ns) edges
               | otherwise = let (nodes, edges') = uniqueNodes ns edges 
                               in ( ((i,name):nodes), edges' )
 
--- connect l1 l2 e devuelve la lista de aristas (n1, n2), donde n1 en l1, n2 en l2
--- en e se van acumulando las aristas
+-- connect l1 l2 e returns a list of edges (n1, n2), where n1 is in l1 and n2 is in l2
+-- edges acumulate in e
 connect :: [LNode String] -> [LNode String] -> [LEdge ()] -> [LEdge ()]
 connect [] _ edges = edges
 connect _ [] edges = edges
@@ -92,18 +92,19 @@ connect ((i1,n1):ns1) l2@((i2,n2):ns2) edges =
       e = (i1,i2,()) :: LEdge ()
     in if i1 > i2 then ( (i2,i1,()) : edges2 ) else ( (i1,i2,()) : edges2 )
 
--- adjustNodes l i devuelve una lista de nodos en la que a cada nodo se me sumó i
+-- adjustNodes l i returns a list of nodes where i was added to each node
 adjustNodes :: [LNode String] -> Int -> [LNode String]
 adjustNodes [] _ = []
 adjustNodes ( (idx,name):ns ) i = ( (idx+i,name) : adjustNodes ns i )
 
--- adjustEdges l i devuelve una lista de aristas en la que al origen y destino de cada arista se le sumó i
+-- adjustEdges l i returns a list of edges (e1, e2) where (e1-i, e2-i) belongs to l
+-- basically this function adds i to every node in every edge
 adjustEdges :: [LEdge ()] -> Int -> [LEdge ()]
 adjustEdges [] _ = []
 adjustEdges ( (src,dst,()):es ) i = ( (src+i,dst+i,()) : adjustEdges es i )
 
--- nameFile g devuelve un string que será el nombre del archivo que se creará
--- si g no es una variable, el archivo se llamará "output"
+-- nameFile g returns a string that will be the file's name that will be created
+-- if g is not a variable, the file will be called "output"
 nameFile :: Graph -> String
-nameFile (Var n) = tail n -- devuelvo tail n porque n empieza con '#'
+nameFile (Var n) = tail n -- i use tail n because n starts with a '#'
 nameFile g = "output"
