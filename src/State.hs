@@ -12,13 +12,12 @@ initState = []
 
 data Error = UndefinedGraph Name
            | UncolourableGraph Name
---           | agregar otros
 
 instance Show Error where
   show (UndefinedGraph n)    = "Graph " ++ show n ++ " was not defined."
   show (UncolourableGraph n) = "Graph " ++ show n ++ " is not colourable."
 
-newtype GraphStateT m a = GraphStateT { runGraphStateT :: Env -> m (Either Error (a,Env)) } -- VER DE PONER Env -> ErrorT Error m a ??????????????????
+newtype GraphStateT m a = GraphStateT { runGraphStateT :: Env -> m (Either Error (a,Env)) } 
 
 -- given a string n and an environment e, returns True if n is a graph in e
 isVarDef :: Name -> Env -> Bool
