@@ -3,7 +3,6 @@ module State where
 import AST
 import Control.Monad                       (liftM, ap)
 import Data.Graph.Inductive.PatriciaTree   (Gr)
-import Data.Graph.Inductive.Graph          (empty)
 
 type Env = [(Name, Gr String ())]
 

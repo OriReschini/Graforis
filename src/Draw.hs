@@ -4,8 +4,7 @@ import State
 import AST 
 import Lib
 import Data.Graph.Inductive.PatriciaTree (Gr)
-import Data.GraphViz                     (graphToDot, GraphvizParams(..), NodeCluster(..), GraphID(..), Number(Int))
-import Data.GraphViz.Attributes.Complete (Attribute(Label, Color), toColorList, Color(RGB)) 
+import Data.GraphViz                     (graphToDot, GraphvizParams(..), NodeCluster(..), GraphID(..), Number(Int)) 
 import Data.GraphViz.Attributes          (toLabel, Labellable)
 import Data.GraphViz.Printing            (renderDot, toDot)
 import Data.Text.Lazy                    (unpack)

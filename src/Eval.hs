@@ -4,7 +4,7 @@ import AST
 import State
 import Draw                                (draw)
 import Colour                              (colour)
-import Data.Graph.Inductive.Graph          (mkGraph, empty, noNodes, labNodes, labEdges, LNode, LEdge, nodeRange)
+import Data.Graph.Inductive.Graph          (mkGraph, empty, labNodes, labEdges, LNode, LEdge, nodeRange)
 import Data.Graph.Inductive.PatriciaTree   (Gr)
 
 

@@ -1,7 +1,7 @@
 module Lib (createFile) where
 
 import AST
-import System.Process           (callCommand, system)
+import System.Process           (callCommand)
 import System.Directory         (removeFile)        
 
 -- createFile d n draws the graph that d represents (d is a graph in Dot format converted to string)
