@@ -25,9 +25,6 @@ params = Params { isDirected       = False
                        }
                     where nodes (num, (label, colour)) = [toLabel label, colour]
 
-color a label colour | a == 2 = [toLabel label, colour]
-                     | otherwise = [toLabel label, colour]
-
 -- hasLoop l returns true if there is a loop in the list l of edges. If not, it returns false
 hasLoop :: [LEdge ()] -> Bool
 hasLoop [] = False
@@ -37,7 +34,7 @@ hasLoop ( (ori, des, ()):es )
 
 -- given a graph, sortGraphNodes returns a list of tuples where the first component of each element is a Node (represented by an Int)
 -- and the second component is a list of Nodes that are connected to the Node in the first component. Also, the list of tuples is 
--- ordered by the length of the list in the second component in descending order.
+-- ordered by the list's length in the second component in descending order.
 sortGraphNodes :: Gr String () -> [(Node, [Node])]
 -- negate (length neighbours) is used so that it is sorted in a descending order
 sortGraphNodes g = sortOn (\(node, neighbours) -> negate(length neighbours)) nodesWithNeighbours
@@ -69,6 +66,7 @@ assignColours g = mkGraph newNodes (labEdges g)
                           nodesWithLabels = sort $ labNodes g
                           newNodes = zipWith (\(n1, lab) (n2, colour) -> (n1, (lab, Color $ colour)) ) nodesWithLabels nodesWithColours
 
+-- drawWithCol g n colours g, creates a file called n and draws the graph in that file
 drawWithCol :: MonadTrans t => Gr String () -> Name -> t IO ()
 drawWithCol g name = do
     let graphColoured = assignColours g 
@@ -76,8 +74,9 @@ drawWithCol g name = do
     lift (createFile dot name)
 
 -- given a graph g and a name n, this function colours g and creates a file called n with the coloured graph 
+-- if the graph is not colourable, it returns an error saying that it's not possible to colour g 
 colour :: (MonadTrans t, MonadError (t IO)) => Gr String () -> Name -> t IO ()
-colour g name = --drawWithCol g name
+colour g name = 
     do 
         let edges = labEdges g 
         if hasLoop edges then throwUncolourableG name else drawWithCol g name
