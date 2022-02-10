@@ -1,0 +1,3 @@
+-- the empty graph is the neutral element of the connect operation
+#graph := a * empty;
+draw #graph
