@@ -40,23 +40,31 @@ sortGraphNodes :: Gr String () -> [(Node, [Node])]
 sortGraphNodes g = sortOn (\(node, neighbours) -> negate(length neighbours)) nodesWithNeighbours
                     where nodesWithNeighbours = map (\i -> (i, neighbors g i)) (nodes g)
 
-availableColours :: [ColorList]
+typicalColours :: [ColorList]
 -- colours: red, green, blue, light blue, fuchsia, orange, purple, yellow, light pink, dark green, dark blue, brown
-availableColours = [toColorList [RGB 255 0 0], toColorList [RGB 0 255 0], toColorList [RGB 0 0 255], toColorList [RGB 0 255 255],
+typicalColours = [toColorList [RGB 255 0 0], toColorList [RGB 0 255 0], toColorList [RGB 0 0 255], toColorList [RGB 0 255 255],
                     toColorList [RGB 255 0 255], toColorList [RGB 255 128 0], toColorList [RGB 127 0 255], toColorList [RGB 255 255 0], 
                     toColorList [RGB 255 190 190], toColorList [RGB 0 102 0], toColorList [RGB 0 0 102], toColorList [RGB 102 0 0]]
+
+additionalColours :: [ColorList]
+-- it is not necessary to check that none of these generated colours are not in the typicalColours list because none of those can be generated
+-- with the values given to r, g and b. 
+-- in this list of additional colours, each component of a colour (red, green, blue) ranges from 1 to 255 and with a step of 30 so that we don't
+-- get colours that are 'too' similar 
+additionalColours = [toColorList [RGB r g b] | r <- [1,30..255], g <- [1,30..255], b <- [1,30..255]]
 
 -- returns a list of tuples (n, colour) where n is a node and colour represents the colour assigned
 realAssignment :: [(Node, [Node])] -> [(Node, ColorList)] -> Int -> [(Node, ColorList)]
 realAssignment [] res _ = res
-realAssignment sortedNodes res k = realAssignment [n | n <- sortedNodes, (fst n, availableColours !! k) `notElem` newRes] newRes (k+1)
+realAssignment sortedNodes res k = realAssignment [n | n <- sortedNodes, (fst n, colours !! k) `notElem` newRes] newRes (k+1)
                                     where colourNodesWith _ [] res = res
                                           -- if node has a neighbour with colour k
                                           colourNodesWith k ((node, neigh) : ns) res = 
-                                              if any (\n -> (n, availableColours !! k) `elem` res) neigh
+                                              if any (\n -> (n, colours !! k) `elem` res) neigh
                                                 then colourNodesWith k ns res
-                                                else colourNodesWith k ns ((node, availableColours !! k) : res)
+                                                else colourNodesWith k ns ((node, colours !! k) : res)
                                           newRes = colourNodesWith k sortedNodes res
+                                          colours = typicalColours++additionalColours
 
 -- assignColours g returns a coloured graph
 assignColours :: Gr String () -> Gr (String, Attribute) ()
