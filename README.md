@@ -1,6 +1,10 @@
 # Graforis
-DSL to define, draw and colour graphs.
+DSL to define, draw and colour undirected graphs without edge labelling.
 
-stack setup
-stack build
-stack exec Graforis-exe test/<filename>
+## Usage:
+
+    stack setup
+
+    stack build
+
+    stack exec Graforis-exe test/_filename_
